@@ -205,10 +205,10 @@ MaziacsAs — это классический roguelike с элементами 
 **2. Перевод USDT на:**
 
 **USDT / Сеть TON**  
-`UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO`
+UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO
 
 **USDT / Сеть TRC20 (Tron)**  
-`TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH`
+TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 
 ⚠️ **Важно:** Отправляйте только через указанную сеть. Ошибка = потеря средств.
 
