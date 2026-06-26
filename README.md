@@ -171,7 +171,7 @@ MaziacsAs — это классический roguelike с элементами 
 
 ## Установка и запуск
 
-Скачайте архив [**MaziacsAs.zip**](MaziacsAs.zip), разархивируйте его и запустите `MaziacsAs.exe` из папки.
+Скачайте архив [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip), разархивируйте его и запустите `MaziacsAs.exe` из папки.
 
 > 📌 Проверка целостности: `MaziacsAs.zip.sha256`
 ---
@@ -238,14 +238,14 @@ TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 
 Для использования игры и кода в коммерческих целях необходимо предварительно обговорить условия с разработчиком.
 
-По вопросам сотрудничества:
+По всем вопросам обращайтесь:
 
 - **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
 - **Email:** sh17aleksandr@gmail.com
 
 Спасибо за уважение к моему труду! 🙌
 
-Подробнее см. (LICENSE.txt)
+Подробнее см. [LICENSE.txt](LICENSE.txt)
 
 ---
 
