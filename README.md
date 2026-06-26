@@ -15,7 +15,8 @@
 ---
 
 ## О проекте
-<img width="1919" height="1031" alt="2026-06-26_01-12" src="https://github.com/user-attachments/assets/dbc37148-c143-44be-a9fb-d181cc2b9387" />
+
+![Скриншот игры](https://github.com/user-attachments/assets/dbc37148-c143-44be-a9fb-d181cc2b9387)
 
 
 **MaziacsAs** — это захватывающая игра-лабиринт, где вы управляете героем, исследующим запутанные коридоры в поисках сокровищ, сражаетесь с пауками, собираете полезные предметы и находите путь к цели. Игра сочетает в себе элементы стратегии, головоломки и экшена, предлагая множество уровней сложности и уникальный режим кампании. Также доступен встроенный редактор карт для создания, редактирования, загрузки и обмена собственными лабиринтами.
@@ -180,10 +181,10 @@ MaziacsAs — это классический roguelike с элементами 
 
 ---
 
-## Разработчик
+## Контакт разработчика
 
-- **Контакт - Email:** sh17aleksandr@gmail.com
-- **Версия:** 1.0
+- **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
+- **Email:** sh17aleksandr@gmail.com
 
 ---
 
@@ -193,13 +194,20 @@ MaziacsAs — это классический roguelike с элементами 
 
 > Донаты добровольны.
 
-### Принимаются USDT на:
+### Способы поддержки:
+
+**1. Перевод через Telegram (быстро и без комиссии):**
+Вы можете перевести USDT через встроенный сервис **Wallet** в Telegram.
+- Напишите мне в личные сообщения: [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
+- В низу чата нажмите на иконку «скрепки» -> **Wallet (Кошелек)** -> **Отправить** -> **USDT**.
+
+**2. Перевод USDT на:**
 
 **USDT / Сеть TON**  
-UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO
+`UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO`
 
 **USDT / Сеть TRC20 (Tron)**  
-TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
+`TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH`
 
 ⚠️ **Важно:** Отправляйте только через указанную сеть. Ошибка = потеря средств.
 
@@ -229,7 +237,10 @@ TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 
 Для использования игры и кода в коммерческих целях необходимо предварительно обговорить условия с разработчиком.
 
-По вопросам сотрудничества: **sh17aleksandr@gmail.com**
+По вопросам сотрудничества:
+
+- **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
+- **Email:** sh17aleksandr@gmail.com
 
 Спасибо за уважение к моему труду! 🙌
 
