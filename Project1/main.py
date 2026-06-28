@@ -1227,15 +1227,6 @@ class Game:
         else:
             self.player.x, self.player.y = self.config.HOUSE_X, self.config.HOUSE_Y
 
-        # # === ВОССТАНАВЛИВАЕМ СТЕНУ (если не восстановилась в _restore_common_map_data) ===
-        # if 'wall_image' in data:
-        #     if data['wall_image'] in self.resource_manager.scaled_images:
-        #         self.current_wall_image = data['wall_image']
-        #     else:
-        #         self.current_wall_image = self.get_random_wall_image()
-        # else:
-        #     self.current_wall_image = self.get_random_wall_image()
-
         # === ВОССТАНАВЛИВАЕМ СТЕНУ ===
         if 'wall_image' in data:
             if data['wall_image'] in self.resource_manager.scaled_images:

@@ -21,7 +21,7 @@
 > 
 > **Исходный код в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
-> **Рабочая версия игры доступна в архиве:** [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip)
+> **Рабочая версия игры (MaziacsAs.exe) доступна в архиве - 📦 Скачать:** [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~17,9 МБ)
 > 
 > 
 > Следите за обновлениями!
@@ -187,7 +187,7 @@ MaziacsAs — это игра с элементами стратегии и го
 
 ## Исходный код
 
-Исходный код игры находится в папке [`Project1/`](https://github.com/AS7go/MaziacsAs/tree/main/Project1/).
+Исходный код игры находится в папке [`Project1`](https://github.com/AS7go/MaziacsAs/tree/main/Project1/).
 Следите за обновлениями!
 
 ---
@@ -195,7 +195,7 @@ MaziacsAs — это игра с элементами стратегии и го
 ## Контакты разработчика
 
 - **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
-- **Email:** sh17aleksandr@gmail.com
+- **Email:** [sh17aleksandr@gmail.com](mailto:sh17aleksandr@gmail.com)
 
 ---
 
@@ -234,7 +234,7 @@ TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 
 ## Благодарности
 
-Спасибо, что играете в MaziacsAs! Ваша поддержка вдохновляет на развитие проекта.
+Спасибо за внимание к проекту MaziacsAs! Ваша поддержка вдохновляет на развитие проекта.
 
 ---
 
@@ -251,7 +251,7 @@ TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 По всем вопросам обращайтесь:
 
 - **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
-- **Email:** sh17aleksandr@gmail.com
+- **Email:** [sh17aleksandr@gmail.com](mailto:sh17aleksandr@gmail.com)
 
 Спасибо за уважение к моему труду! 🙌
 
