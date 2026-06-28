@@ -1,0 +1,75 @@
+LICENSE (Source Available)
+
+Copyright (c) 2026 sh17aleksandr@gmail.com. All rights reserved.
+
+In case of any discrepancies between the translated versions of this license, 
+the English version shall prevail.
+
+---
+
+English Version
+
+This license grants limited rights to use the source code of the game "MaziacsAs" 
+solely for non-commercial educational and learning purposes.
+
+PERMITTED:
+  - Study the source code for personal learning and understanding game development principles.
+  - Modify the local copy of the code for personal needs (without publishing or distributing the changes).
+
+PROHIBITED:
+  - Use the source code or any fragments thereof in commercial projects.
+  - Distribute, resell, publish, or transfer original or modified versions of the game to third parties.
+  - Use graphic, sound, or other assets of the project in any third-party works without written permission from the author.
+
+THE PROJECT IS PROVIDED "AS IS" WITHOUT ANY WARRANTY. THE AUTHOR IS NOT LIABLE 
+FOR ANY DAMAGES OR CONSEQUENCES RESULTING FROM THE USE OF THIS CODE.
+
+For commercial use, written permission from the author is required.
+
+Contact: sh17aleksandr@gmail.com
+
+---
+
+Українська версія
+
+Ця ліцензія надає обмежене право на використання вихідного коду гри «MaziacsAs» 
+виключно в некомерційних, ознайомлювальних та освітніх цілях.
+
+ДОЗВОЛЕНО:
+  - Вивчати вихідний код для особистого навчання та розуміння принципів розробки ігор.
+  - Вносити зміни до локальної копії коду для особистих потреб (без публікації та розповсюдження змін).
+
+ЗАБОРОНЕНО:
+  - Використовувати вихідний код або будь-які його фрагменти в комерційних проектах.
+  - Розповсюджувати, перепродавати, публікувати або передавати третім особам оригінальні чи модифіковані версії гри.
+  - Використовувати графічні, звукові та інші ресурси проекту в будь-яких сторонніх роботах без письмового дозволу автора.
+
+ПРОЕКТ НАДАЄТЬСЯ «ЯК Є» (AS IS) БЕЗ БУДЬ-ЯКИХ ГАРАНТІЙ. АВТОР НЕ НЕСЕ ВІДПОВІДАЛЬНОСТІ ЗА 
+БУДЬ-ЯКІ ЗБИТКИ АБО ІНШІ НАСЛІДКИ, ЩО ВИНИКЛИ В РЕЗУЛЬТАТІ ВИКОРИСТАННЯ ЦЬОГО КОДУ.
+
+Для використання коду в комерційних проектах потрібен письмовий дозвіл автора.
+
+Контакт: sh17aleksandr@gmail.com
+
+---
+
+Русская версия
+
+Настоящая лицензия предоставляет ограниченное право на использование исходного кода игры «MaziacsAs» 
+исключительно в некоммерческих ознакомительных и образовательных целях.
+
+РАЗРЕШЕНО:
+  - Изучать исходный код для личного обучения и понимания принципов разработки игр.
+  - Вносить изменения в локальную копию кода для личных нужд (без публикации и распространения изменений).
+
+ЗАПРЕЩЕНО:
+  - Использовать исходный код или любые его фрагменты в коммерческих проектах.
+  - Распространять, перепродавать, публиковать или передавать третьим лицам оригинальные или модифицированные версии игры.
+  - Использовать графические, звуковые и другие ресурсы проекта в любых сторонних работах без письменного разрешения автора.
+
+ПРОЕКТ ПРЕДОСТАВЛЯЕТСЯ «КАК ЕСТЬ» (AS IS) БЕЗ КАКИХ-ЛИБО ГАРАНТИЙ. АВТОР НЕ НЕСЁТ ОТВЕТСТВЕННОСТИ ЗА 
+ЛЮБЫЕ УБЫТКИ ИЛИ ИНЫЕ ПОСЛЕДСТВИЯ, ВОЗНИКШИЕ В РЕЗУЛЬТАТЕ ИСПОЛЬЗОВАНИЯ ДАННОГО КОДА.
+
+Для использования кода в коммерческих проектах требуется письменное разрешение автора.
+
+Контакт для связи: sh17aleksandr@gmail.com
