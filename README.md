@@ -21,10 +21,13 @@
 > 
 > **Исходный код в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
-> **Рабочая версия игры (MaziacsAs.exe) доступна в архиве - 📦 Скачать:** [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,2 МБ)
+> 📦 **Скачать рабочую версию:**
+> - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,2 МБ)
+>   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 >
-> **SHA-256 хеш - MaziacsAs.zip** [`MaziacsAs.zip.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
-> 
+> - **🐧 Linux (Ubuntu 64-bit .tar.gz):** [MaziacsAs_Linux.tar.gz](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz)
+>   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz.sha256)
+>
 > Следите за обновлениями!
 
 ---
@@ -172,13 +175,13 @@ MaziacsAs — это игра с элементами стратегии и го
 
 ## Системные требования
 
-- Операционная система: Windows (в перспективе macOS / Linux)
+- Операционная система: Windows, Linux (Ubuntu 64-bit)
 
 ---
 
 ## 🚀 Установка и запуск
 
-### Для игроков (готовый `.exe`)
+### 🖥️ Для игроков (готовый `.exe`)
 
 1. Скачайте архив [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip)
 2. Распакуйте в любую папку
@@ -187,6 +190,18 @@ MaziacsAs — это игра с элементами стратегии и го
 > 📌 **Проверка целостности:**  
 > Сравните SHA-256 хеш скачанного файла с содержимым [`MaziacsAs.zip.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 
+### 🐧 Linux (Ubuntu 64-bit)
+1. Скачайте архив [**MaziacsAs_Linux.tar.gz**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz)
+2. Распакуйте архив в удобную папку.
+3. Откройте терминал в папке `MaziacsAs/` и сделайте файл исполняемым:
+   ```bash
+   chmod +x MaziacsAs
+4. Запустите игру командой:
+   ```bash
+   ./MaziacsAs
+
+> 📌 **Проверка целостности:**  
+> Сравните SHA-256 хеш скачанного файла с содержимым [`MaziacsAs_Linux.tar.gz.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz.sha256)
 ---
 
 ## Исходный код
