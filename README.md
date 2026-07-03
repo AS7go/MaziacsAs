@@ -21,7 +21,7 @@
 > 
 > **Исходный код в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
-> **Рабочая версия игры (MaziacsAs.exe) доступна в архиве - 📦 Скачать:** [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~17,9 МБ)
+> **Рабочая версия игры (MaziacsAs.exe) доступна в архиве - 📦 Скачать:** [**MaziacsAs.zip**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip)
 > 
 > 
 > Следите за обновлениями!

@@ -26,11 +26,11 @@ pygame.mixer.init()
 # --- УСТАНОВКА ИКОНКИ ОКНА ---
 try:
     # Загружаем именно .ico
-    icon_path = resource_path("icon.ico")
+    # icon_path = resource_path("icon.ico")
+    icon_path = resource_path("icon.png")
     icon_image = pygame.image.load(icon_path)
     pygame.display.set_icon(icon_image)
 except Exception as e:
-    # Этот принт скроется, так как вы используете --noconsole
     print(f"Не удалось установить иконку: {e}")
 
 # КОНФИГУРАЦИЯ ИГРОВЫХ ПАРАМЕТРОВ
@@ -186,7 +186,7 @@ class ResourceManager:
 
         # === ДОБАВЛЯЕМ ВСЕ ВАРИАНТЫ СТЕН ===
         # Динамически добавляем wall1.png, wall2.png, wall3.png, ...
-        for i in range(1, 34): # стены wall1.png, wall2.png, wall3.png, ...
+        for i in range(1, 34):
             images_to_load[f'wall{i}'] = f"wall{i}.png"
         
         # Стандартная стена (запасной вариант)
