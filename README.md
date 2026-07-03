@@ -202,9 +202,11 @@ MaziacsAs — это игра с элементами стратегии и го
 3. Откройте терминал в папке `MaziacsAs/` и сделайте файл исполняемым:
    ```bash
    chmod +x MaziacsAs
+   ```
 4. Запустите игру командой:
    ```bash
    ./MaziacsAs
+   ```
 
 > 📌 **Проверка целостности:**  
 > Сравните SHA-256 хеш скачанного файла с содержимым [`MaziacsAs_Linux.tar.gz.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz.sha256)
@@ -212,13 +214,43 @@ MaziacsAs — это игра с элементами стратегии и го
 🛡️ Проверка целостности в Linux (Ubuntu, Debian, Fedora и т.д.):
 1. Выполните в терминале Linux команду: 
    ```bash
-   sha256sum MaziacsAs_Linux.tar.gz 
+   sha256sum MaziacsAs_Linux.tar.gz
+   ``` 
 2. Сверьте результат с содержимым файла MaziacsAs_Linux.tar.gz.sha256.
 ---
 
-## Исходный код
+## 🛠️ Исходный код и сборка
 
 Исходный код игры находится в папке [`Project1`](https://github.com/AS7go/MaziacsAs/tree/main/Project1/).
+
+📦 Скачайте архив [**Project1.zip**](https://github.com/AS7go/MaziacsAs/raw/main/Project1.zip)
+
+### 💻 Сборка из исходного кода для Windows
+
+1. Скачайте директорию `Project1`.
+2. Убедитесь, что у вас установлены **Python**, все необходимые зависимости проекта и **PyInstaller**.
+3. В терминале откройте папку, в которой находится файл `main.py`.
+4. Выполните команду:
+
+```bash
+pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.ico" --add-data "img;img" --add-data "sound;sound" --add-data "icon.png;." main.py
+```
+
+### 🐧 Сборка из исходного кода для Linux
+
+1. Скачайте директорию `Project1`.
+2. Убедитесь, что у вас установлены **Python**, все необходимые зависимости проекта и **PyInstaller**.
+3. В терминале откройте папку, в которой находится файл `main.py`.
+4. Выполните команду:
+
+```bash
+pyinstaller --onedir --noconsole --name "MaziacsAs" --add-data "img:img" --add-data "sound:sound" --add-data "icon.png:." main.py
+```
+
+> **Примечание:** В Linux файл `icon.png` используется для иконки окна игры. Сам исполняемый файл не может иметь собственную иконку, как это реализовано в Windows.
+
+📌 **Результат:** после сборки PyInstaller создаст папку `dist/MaziacsAs`, в которой будут находиться исполняемый файл `MaziacsAs`, папка `_internal` со всеми зависимостями, а также необходимые изображения и звуковые файлы.
+
 Следите за обновлениями!
 
 ---
