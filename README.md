@@ -19,9 +19,9 @@
 >
 >[![Telegram](https://img.shields.io/badge/Telegram-@Aleksandr_Sh17-blue?logo=telegram)](https://t.me/Aleksandr_Sh17)
 > 
-> **Исходный код в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
+> 🛠️ **Исходный код (для разработчиков) в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
-> 📦 **Скачать рабочую версию:**
+> 📦 **Скачать готовую версию (для игроков):**
 > - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,2 МБ)
 >   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 >
@@ -225,6 +225,29 @@ MaziacsAs — это игра с элементами стратегии и го
 
 📦 Скачайте архив [**Project1.zip**](https://github.com/AS7go/MaziacsAs/raw/main/Project1.zip)
 
+---
+
+### Зависимости
+
+Проект проверен и работает со следующими версиями:
+
+| Компонент | Версия | Требование |
+|-----------|--------|------------|
+| **Python** | `3.12.10` | 3.10 – 3.12 |
+| **Pygame** | `2.6.1` | 2.5.0+ |
+| **PyInstaller** | `6.21.0` | 6.0.0+ |
+
+
+#### Установка зависимостей
+
+```bash
+pip install -r requirements.txt
+```
+Или вручную: 
+```bash
+pip install pygame==2.6.1 pyinstaller==6.21.0
+```
+
 ### 💻 Сборка из исходного кода для Windows
 
 1. Скачайте директорию `Project1`.
@@ -250,8 +273,6 @@ pyinstaller --onedir --noconsole --name "MaziacsAs" --add-data "img:img" --add-d
 > **Примечание:** В Linux файл `icon.png` используется для иконки окна игры. Сам исполняемый файл не может иметь собственную иконку, как это реализовано в Windows.
 
 📌 **Результат:** после сборки PyInstaller создаст папку `dist/MaziacsAs`, в которой будут находиться исполняемый файл `MaziacsAs`, папка `_internal` со всеми зависимостями, а также необходимые изображения и звуковые файлы.
-
-Следите за обновлениями!
 
 ---
 
@@ -315,8 +336,6 @@ TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH
 
 - **Telegram:** [@Aleksandr_Sh17](https://t.me/Aleksandr_Sh17)
 - **Email:** [sh17aleksandr@gmail.com](mailto:sh17aleksandr@gmail.com)
-
-Спасибо за уважение к моему труду! 🙌
 
 Подробнее см. [LICENSE.txt](LICENSE.txt)
 
