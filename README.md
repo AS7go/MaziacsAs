@@ -190,11 +190,8 @@ MaziacsAs — это игра с элементами стратегии и го
 🛡️ Как проверить целостность файла (SHA-256):
 1. Нажмите Win + X и выберите Терминал (или PowerShell).
 2. Введите команду: Get-FileHash "путь\к\вашему\MaziacsAs.zip" -Algorithm SHA256
-3. Сравните полученный результат с содержимым файла MaziacsAs.zip.sha256. Они должны совпадать.
+3. Сравните полученный результат с содержимым файла [`MaziacsAs.zip.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256). Они должны совпадать.
 (Регистр символов — заглавные или строчные — значения не имеет).
-
-> 📌 **Проверка целостности:**  
-> Сравните SHA-256 хеш скачанного файла с содержимым [`MaziacsAs.zip.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 
 ### 🐧 Linux (Ubuntu 64-bit)
 1. Скачайте архив [**MaziacsAs_Linux.tar.gz**](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz)
@@ -208,15 +205,12 @@ MaziacsAs — это игра с элементами стратегии и го
    ./MaziacsAs
    ```
 
-> 📌 **Проверка целостности:**  
-> Сравните SHA-256 хеш скачанного файла с содержимым [`MaziacsAs_Linux.tar.gz.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz.sha256)
-
 🛡️ Проверка целостности в Linux (Ubuntu, Debian, Fedora и т.д.):
 1. Выполните в терминале Linux команду: 
    ```bash
    sha256sum MaziacsAs_Linux.tar.gz
    ``` 
-2. Сверьте результат с содержимым файла MaziacsAs_Linux.tar.gz.sha256.
+2. Сверьте результат с содержимым файла [`MaziacsAs_Linux.tar.gz.sha256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz.sha256)
 ---
 
 ## 🛠️ Исходный код и сборка
