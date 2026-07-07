@@ -7,6 +7,7 @@ from collections import deque
 import sys
 import json
 import math
+import pyperclip
 
 # --- БЛОК для компиляции кода ---
 def resource_path(relative_path):
@@ -649,7 +650,7 @@ class Game:
         self.current_map_pointer_index = 0
         self.last_map_pointer_change_time = 0
         self.MAP_POINTER_ANIMATION_SPEED = 500  # мс между сменой кадров
-        self.menu_items = ["Menu", "FREE PLAY", "CAMPAIGN", "Instructions", "About"]
+        self.menu_items = ["Menu", "FREE PLAY", "CAMPAIGN", "Instructions", "About", "Donate"]
         self.menu_rects = {}
         self.active_menu_item = None
         self.show_overlay_text = None
@@ -681,6 +682,16 @@ class Game:
             "sh17aleksandr@gmail.com",
             "Version 1.0"
         ]
+
+        # !!! 
+        self.donation_wallets = [
+            {"name": "USDT / TON Network", "address": "UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO", "rect": None},
+            {"name": "USDT / TRC20 Network (Tron)", "address": "TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH", "rect": None}
+        ]
+        self.donation_back_button_rect = None
+        self.donate_copy_message = ""  # Сообщение о копировании
+        self.donate_copy_message_time = 0  # Время появления сообщения
+        # =============
 
         self.editor_tools = ['wall', 'door', 'path', 'sword', 'time', 'pointer', 'spider', 'treasure', 'house']
         self.selected_tool = None  # Изменено: по умолчанию ничего не выбрано
@@ -2940,6 +2951,13 @@ class Game:
 
     def handle_ui_click(self, event):
         """Обработка кликов по UI элементам. Возвращает True если клик был по UI."""
+
+        # ===!!! ПЕРВЫЙ ПРИОРИТЕТ: Если открыто меню доната - все клики идут в него ===
+        if self.active_menu_item == "Donate":
+            self.handle_mouse_click(event)
+            return True  # Всегда возвращаем True, блокируем другие обработчики
+        # ========================================
+        
         # Проверяем клик по верхнему меню
         for item_name, rect in self.menu_rects.items():
             expanded_rect = rect.inflate(
@@ -3335,6 +3353,50 @@ class Game:
             self.menu_rects[item] = text_rect
             menu_item_x += text_rect.width + int(20 * self.state.scale_factor)
         
+        # !!! ====================================================
+        # === ОБРАБОТКА КЛИКОВ В МЕНЮ ДОНАТА ===
+        if self.active_menu_item == "Donate":
+            # Проверяем клик по адресам
+            for wallet in self.donation_wallets:
+                if wallet["rect"] and wallet["rect"].collidepoint(mouse_pos):
+                    try:
+                        pyperclip.copy(wallet["address"])
+                        self.donate_copy_message = f"{wallet['name']} address copied!"
+                        self.donate_copy_message_time = time.time()
+                        return True
+                    except:
+                        self.donate_copy_message = f"Failed to copy {wallet['name']} address"
+                        self.donate_copy_message_time = time.time()
+                        return True
+            
+            # Проверяем клик по BACK
+            if hasattr(self, 'donation_back_button_rect') and self.donation_back_button_rect:
+                if self.donation_back_button_rect.collidepoint(mouse_pos):
+                    self.active_menu_item = None
+                    self.state.game_paused = False
+                    self.menu_open_with_keyboard = False
+                    self.donate_copy_message = ""
+                    return True
+            
+            # Закрытие при клике вне
+            dialog_width = int(700 * self.state.scale_factor)
+            dialog_height = int(500 * self.state.scale_factor)
+            dialog_x = (self.config.SCREEN_WIDTH - dialog_width) // 2
+            dialog_y = (self.config.SCREEN_HEIGHT - dialog_height) // 2
+            dialog_rect = pygame.Rect(dialog_x, dialog_y, dialog_width, dialog_height)
+            
+            if not dialog_rect.collidepoint(mouse_pos):
+                self.active_menu_item = None
+                self.state.game_paused = False
+                self.menu_open_with_keyboard = False
+                self.donate_copy_message = ""
+                return True
+            
+            return True
+
+        # ====================================================
+
+
         # Проверяем клик по пунктам верхнего меню
         for item_name, rect in self.menu_rects.items():
             # Создаем увеличенную область клика для лучшего UX
@@ -3408,6 +3470,16 @@ class Game:
                     self.state.game_paused = True
                     self.state.pause_start_time = current_time
                     return True  # ВАЖНО: возвращаем управление
+                
+                # Donate !!!
+                elif item_name == "Donate":
+                    # Открываем меню доната
+                    self.active_menu_item = "Donate"
+                    self.state.game_paused = True
+                    self.menu_open_with_keyboard = False
+                    return True
+
+
 
                 break
 
@@ -3846,6 +3918,14 @@ class Game:
     def handle_keydown(self, event):
         """Обработка нажатий клавиш (диалоги кампании обрабатываются в handle_events)"""
         current_time = time.time()
+
+        # === !!! ДОБАВЛЯЕМ: Закрытие меню доната по ESC ===
+        if event.key == pygame.K_ESCAPE:
+            if self.active_menu_item == "Donate":
+                self.active_menu_item = None
+                self.state.game_paused = False
+                self.menu_open_with_keyboard = False
+                return
 
         # === ПЕРВЫЙ ПРИОРИТЕТ: СНЯТИЕ ПАУЗЫ ПО ПРОБЕЛУ ===
         if (self.state.game_paused and 
@@ -4695,6 +4775,11 @@ class Game:
         if self.state.show_combined_dialog:
             self.draw_combined_dialog()
 
+        # ===!!! ДОБАВЛЯЕМ: Отрисовка меню доната ===
+        if self.active_menu_item == "Donate":
+            self.draw_donate_menu()
+            return  # Не рисуем остальной UI
+
         # Отрисовка диалога выхода из кампании
         if self.state.show_exit_campaign_dialog:
             self.draw_exit_campaign_dialog()
@@ -5332,6 +5417,143 @@ class Game:
                 'left': pygame.Rect(dialog_x + left_rect.x, dialog_y + left_rect.y, btn_w, btn_h),
                 'right': pygame.Rect(dialog_x + right_rect.x, dialog_y + right_rect.y, btn_w, btn_h)
             }
+
+    
+    # !!! =====
+
+    def draw_donate_menu(self):
+        """Отрисовка меню поддержки проекта"""
+        # Затемняем фон
+        overlay = pygame.Surface((self.config.SCREEN_WIDTH, self.config.SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 200))
+        self.screen.blit(overlay, (0, 0))
+        
+        # Основной контейнер
+        dialog_width = int(700 * self.state.scale_factor)
+        dialog_height = int(550 * self.state.scale_factor)
+        dialog_x = (self.config.SCREEN_WIDTH - dialog_width) // 2
+        dialog_y = (self.config.SCREEN_HEIGHT - dialog_height) // 2
+        
+        dialog_surface = pygame.Surface((dialog_width, dialog_height), pygame.SRCALPHA)
+        dialog_surface.fill((20, 20, 30, 240))
+        pygame.draw.rect(dialog_surface, self.config.GOLD, (0, 0, dialog_width, dialog_height), 3)
+        
+        # Заголовок
+        title_text = self.fonts['ui_header'].render("SUPPORT THE PROJECT", True, self.config.GOLD)
+        title_rect = title_text.get_rect(center=(dialog_width // 2, int(40 * self.state.scale_factor)))
+        dialog_surface.blit(title_text, title_rect)
+        
+        # Подзаголовок
+        sub_text = self.fonts['info'].render("Click on address to copy", True, self.config.LIGHT_YELLOW)
+        sub_rect = sub_text.get_rect(center=(dialog_width // 2, int(70 * self.state.scale_factor)))
+        dialog_surface.blit(sub_text, sub_rect)
+        
+        mouse_pos = pygame.mouse.get_pos()
+        
+        # Список кошельков
+        for i, wallet in enumerate(self.donation_wallets):
+            y = int(120 * self.state.scale_factor) + i * int(100 * self.state.scale_factor)
+            
+            # Имя сети
+            name_text = self.fonts['menu'].render(wallet["name"], True, self.config.LIGHT_GREEN)
+            dialog_surface.blit(name_text, (int(40 * self.state.scale_factor), y))
+            
+            # Адрес - показываем полностью
+            addr_rect = pygame.Rect(
+                int(40 * self.state.scale_factor),
+                y + int(35 * self.state.scale_factor),
+                dialog_width - int(80 * self.state.scale_factor),
+                int(30 * self.state.scale_factor)
+            )
+            
+            # Сохраняем rect для обработки кликов
+            global_addr_rect = pygame.Rect(
+                dialog_x + addr_rect.x,
+                dialog_y + addr_rect.y,
+                addr_rect.width,
+                addr_rect.height
+            )
+            wallet["rect"] = global_addr_rect
+            
+            # Подсветка при наведении
+            is_hover = global_addr_rect.collidepoint(mouse_pos)
+            bg_color = (60, 60, 80) if is_hover else (40, 40, 60)
+            pygame.draw.rect(dialog_surface, bg_color, addr_rect)
+            pygame.draw.rect(dialog_surface, self.config.GOLD if is_hover else self.config.GREY, addr_rect, 1)
+            
+            # Показываем адрес полностью
+            addr_text = self.fonts['info'].render(wallet["address"], True, self.config.WHITE)
+            addr_text_rect = addr_text.get_rect(center=addr_rect.center)
+            dialog_surface.blit(addr_text, addr_text_rect)
+
+        # ========== ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ ==========
+        last_wallet_y = int(120 * self.state.scale_factor) + (len(self.donation_wallets) - 1) * int(100 * self.state.scale_factor)
+        warning_y = last_wallet_y + int(100 * self.state.scale_factor)
+        
+        # Желтая линия-разделитель
+        pygame.draw.line(dialog_surface, self.config.YELLOW, 
+                        (int(40 * self.state.scale_factor), warning_y),
+                        (dialog_width - int(40 * self.state.scale_factor), warning_y), 2)
+        
+        # Предупреждение
+        warning_text1 = self.fonts['info'].render("IMPORTANT:", True, self.config.RED)
+        dialog_surface.blit(warning_text1, (int(40 * self.state.scale_factor), warning_y + int(15 * self.state.scale_factor)))
+        
+        warning_text2 = self.fonts['info'].render("Send ONLY using the specified network. Wrong network = loss of funds.", True, self.config.LIGHT_YELLOW)
+        warning_rect2 = warning_text2.get_rect(center=(dialog_width // 2, warning_y + int(45 * self.state.scale_factor)))
+        dialog_surface.blit(warning_text2, warning_rect2)
+        
+        # === СООБЩЕНИЕ О КОПИРОВАНИИ ===
+        current_time = time.time()
+        if self.donate_copy_message and current_time - self.donate_copy_message_time < 3.0:
+            # Используем тот же шрифт что и для предупреждения (info)
+            msg_text = self.fonts['info'].render(self.donate_copy_message, True, self.config.LIGHT_GREEN)
+            msg_height = msg_text.get_height() + 20  # Добавляем отступы
+            msg_width = msg_text.get_width() + 40
+            
+            msg_surface = pygame.Surface((msg_width, msg_height), pygame.SRCALPHA)
+            msg_surface.fill((0, 0, 0, 200))
+            pygame.draw.rect(msg_surface, self.config.LIGHT_GREEN, (0, 0, msg_width, msg_height), 2)
+            
+            msg_rect = msg_text.get_rect(center=(msg_width // 2, msg_height // 2))
+            msg_surface.blit(msg_text, msg_rect)
+            
+            # Позиционируем между предупреждением и кнопкой BACK
+            # BACK находится на dialog_height - 70, предупреждение заканчивается на warning_y + 45 + 20
+            # Считаем середину между ними
+            warning_bottom = warning_y + int(45 * self.state.scale_factor) + int(20 * self.state.scale_factor)
+            back_top = dialog_height - int(70 * self.state.scale_factor)
+            msg_y = warning_bottom + (back_top - warning_bottom - msg_height) // 2
+            
+            msg_x = (dialog_width - msg_width) // 2
+            dialog_surface.blit(msg_surface, (msg_x, msg_y))
+        
+        # Кнопка BACK
+        back_rect = pygame.Rect(
+            dialog_width // 2 - int(100 * self.state.scale_factor),
+            dialog_height - int(70 * self.state.scale_factor),
+            int(200 * self.state.scale_factor),
+            int(40 * self.state.scale_factor)
+        )
+        
+        global_back_rect = pygame.Rect(
+            dialog_x + back_rect.x,
+            dialog_y + back_rect.y,
+            back_rect.width,
+            back_rect.height
+        )
+        self.donation_back_button_rect = global_back_rect
+        
+        is_back_hover = global_back_rect.collidepoint(mouse_pos)
+        back_color = (150, 50, 50) if is_back_hover else (100, 30, 30)
+        pygame.draw.rect(dialog_surface, back_color, back_rect)
+        pygame.draw.rect(dialog_surface, self.config.WHITE, back_rect, 2)
+        
+        back_text = self.fonts['menu'].render("BACK", True, self.config.WHITE)
+        back_text_rect = back_text.get_rect(center=back_rect.center)
+        dialog_surface.blit(back_text, back_text_rect)
+        
+        self.screen.blit(dialog_surface, (dialog_x, dialog_y))
 
     def draw_exit_campaign_dialog(self):
         buttons = self.draw_confirmation_dialog(
