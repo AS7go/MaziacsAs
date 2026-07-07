@@ -27,7 +27,7 @@
 > 🛠️ **Исходный код (для разработчиков) в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
 > 📦 **Скачать готовую версию (для игроков):**
-> - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,2 МБ)
+> - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,3 МБ)
 >   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 >
 > - **🐧 Linux (Ubuntu 64-bit .tar.gz):** [MaziacsAs_Linux.tar.gz](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz)
