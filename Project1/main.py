@@ -7,7 +7,9 @@ from collections import deque
 import sys
 import json
 import math
-import pyperclip
+import pyperclip # Оставляем, для Windows. В Ubuntu не копирует без доп установок xclip или xsel
+import platform
+import subprocess
 
 # --- БЛОК для компиляции кода ---
 def resource_path(relative_path):
@@ -683,7 +685,7 @@ class Game:
             "Version 1.0"
         ]
 
-        # !!! 
+        # === Donate === 
         self.donation_wallets = [
             {"name": "USDT / TON Network", "address": "UQBO4Yl3zoAy7M-YLg01dsx8mrhM0vY5abhkxrWGsVS2FlnO", "rect": None},
             {"name": "USDT / TRC20 Network (Tron)", "address": "TFTy9eeDZJjypeHezcgKdnGmccfREHz8TH", "rect": None}
@@ -691,7 +693,7 @@ class Game:
         self.donation_back_button_rect = None
         self.donate_copy_message = ""  # Сообщение о копировании
         self.donate_copy_message_time = 0  # Время появления сообщения
-        # =============
+        # ==============
 
         self.editor_tools = ['wall', 'door', 'path', 'sword', 'time', 'pointer', 'spider', 'treasure', 'house']
         self.selected_tool = None  # Изменено: по умолчанию ничего не выбрано
@@ -820,7 +822,7 @@ class Game:
         """Сбрасывает кэш размеров лабиринта"""
         self.cached_maze_dimensions = None
 
-    # === Обновление иконки стены сбоку !!!
+    # === Обновление иконки стены сбоку ===
     def update_wall_icon(self):
         """Обновление иконки стены в UI панели"""
         # Берем текущий стиль стены
@@ -844,7 +846,7 @@ class Game:
             del self.resource_manager.scaled_images[key]
 
 
-    # === Стили стены по кругу !!! ===
+    # === Стили стены по кругу ===
     def cycle_wall_style(self, direction=1):
         """
         Переключение стиля стены по кругу
@@ -875,7 +877,7 @@ class Game:
         next_index = (current_index + direction) % len(wall_styles)
         self.current_wall_image = wall_styles[next_index]
 
-        # === ОБНОВЛЯЕМ ИКОНКУ В МЕНЮ !!! ===
+        # === ОБНОВЛЯЕМ ИКОНКУ В МЕНЮ ===
         self.update_wall_icon()
         
         # Показываем номер стиля (например: "Wall: 3/8")
@@ -994,7 +996,7 @@ class Game:
         # Масштабирование изображений
         self.resource_manager.scale_images(self.cell_size, self.state.scale_factor)
 
-        # === ОБНОВЛЯЕМ ИКОНКУ СТЕНЫ В СООТВЕТСТВИИ С ТЕКУЩИМ СТИЛЕМ !!! ===
+        # === ОБНОВЛЯЕМ ИКОНКУ СТЕНЫ В СООТВЕТСТВИИ С ТЕКУЩИМ СТИЛЕМ ===
         self.update_wall_icon()
         
         # === СБРОС UI RECTS ПРИ ИЗМЕНЕНИИ РАЗМЕРОВ ===
@@ -1135,7 +1137,7 @@ class Game:
             self.maze.house_sword_position = None
             self.maze.house_swords_count = 0
 
-        # === ВОССТАНАВЛИВАЕМ СТЕНУ !!! ===
+        # === ВОССТАНАВЛИВАЕМ СТЕНУ ===
         if 'wall_image' in data:
             if data['wall_image'] in self.resource_manager.scaled_images:
                 self.current_wall_image = data['wall_image']
@@ -1300,7 +1302,7 @@ class Game:
         self.state.campaign_completed = s_data.get('campaign_completed', False)
         self.state.game_mode = data.get('game_mode', 'game')
 
-        # === ВОССТАНАВЛИВАЕМ СТЕНУ !!! ===
+        # === ВОССТАНАВЛИВАЕМ СТЕНУ ===
         if 'wall_image' in data:
             if data['wall_image'] in self.resource_manager.scaled_images:
                 self.current_wall_image = data['wall_image']
@@ -2207,7 +2209,7 @@ class Game:
     def reset_game(self, map_filename=None, keep_wall_style=False):
         """Сброс игры с новым таймером, но сохранением режима кампании"""
         try: 
-            # ========== ВЫБИРАЕМ СЛЕДУЮЩУЮ СТЕНУ ПО КРУГУ !!! ==========
+            # ========== ВЫБИРАЕМ СЛЕДУЮЩУЮ СТЕНУ ПО КРУГУ ==========
             if not keep_wall_style: 
                 self.cycle_wall_style(1)    
             # ===========================================================
@@ -2952,7 +2954,7 @@ class Game:
     def handle_ui_click(self, event):
         """Обработка кликов по UI элементам. Возвращает True если клик был по UI."""
 
-        # ===!!! ПЕРВЫЙ ПРИОРИТЕТ: Если открыто меню доната - все клики идут в него ===
+        # === ПЕРВЫЙ ПРИОРИТЕТ: Если открыто меню доната - все клики идут в него ===
         if self.active_menu_item == "Donate":
             self.handle_mouse_click(event)
             return True  # Всегда возвращаем True, блокируем другие обработчики
@@ -3353,7 +3355,6 @@ class Game:
             self.menu_rects[item] = text_rect
             menu_item_x += text_rect.width + int(20 * self.state.scale_factor)
         
-        # !!! ====================================================
         # === ОБРАБОТКА КЛИКОВ В МЕНЮ ДОНАТА ===
         if self.active_menu_item == "Donate":
             # Проверяем клик по адресам
@@ -3365,8 +3366,9 @@ class Game:
                         self.donate_copy_message_time = time.time()
                         return True
                     except:
-                        self.donate_copy_message = f"Failed to copy {wallet['name']} address"
+                        self.donate_copy_message = f"Copy failed. Opening DONATE.txt"
                         self.donate_copy_message_time = time.time()
+                        open_donation_file() # <--- ВЫЗОВ ОТКРЫТИЯ ФАЙЛА
                         return True
             
             # Проверяем клик по BACK
@@ -3393,9 +3395,7 @@ class Game:
                 return True
             
             return True
-
         # ====================================================
-
 
         # Проверяем клик по пунктам верхнего меню
         for item_name, rect in self.menu_rects.items():
@@ -3471,15 +3471,12 @@ class Game:
                     self.state.pause_start_time = current_time
                     return True  # ВАЖНО: возвращаем управление
                 
-                # Donate !!!
                 elif item_name == "Donate":
                     # Открываем меню доната
                     self.active_menu_item = "Donate"
                     self.state.game_paused = True
                     self.menu_open_with_keyboard = False
                     return True
-
-
 
                 break
 
@@ -3571,7 +3568,7 @@ class Game:
                 if item_rect.collidepoint(mouse_pos):
                     if option["action"]:
                         self.level_navigation_index = i
-                        option["action"]()   # <-- Здесь вызывается set_difficulty(), который уже использует keep_wall_style=True !!!
+                        option["action"]()   # <-- Здесь вызывается set_difficulty(), который уже использует keep_wall_style=True
                         self.close_all_interfaces_and_resume(current_time)
                     return True
         
@@ -3918,14 +3915,6 @@ class Game:
     def handle_keydown(self, event):
         """Обработка нажатий клавиш (диалоги кампании обрабатываются в handle_events)"""
         current_time = time.time()
-
-        # === !!! ДОБАВЛЯЕМ: Закрытие меню доната по ESC ===
-        if event.key == pygame.K_ESCAPE:
-            if self.active_menu_item == "Donate":
-                self.active_menu_item = None
-                self.state.game_paused = False
-                self.menu_open_with_keyboard = False
-                return
 
         # === ПЕРВЫЙ ПРИОРИТЕТ: СНЯТИЕ ПАУЗЫ ПО ПРОБЕЛУ ===
         if (self.state.game_paused and 
@@ -4497,7 +4486,7 @@ class Game:
         self.set_editor_message(f"Sound {'enabled' if self.sound_enabled else 'disabled'}")
 
     def toggle_time_timer(self):
-        """Переключение режима таймера жизни !!! """
+        """Переключение режима таймера жизни """
         self.state.time_timer_enabled = not self.state.time_timer_enabled
         
         # Сбрасываем таймер при включении/выключении
@@ -4775,7 +4764,7 @@ class Game:
         if self.state.show_combined_dialog:
             self.draw_combined_dialog()
 
-        # ===!!! ДОБАВЛЯЕМ: Отрисовка меню доната ===
+        # === ДОБАВЛЯЕМ: Отрисовка меню доната ===
         if self.active_menu_item == "Donate":
             self.draw_donate_menu()
             return  # Не рисуем остальной UI
@@ -5079,7 +5068,7 @@ class Game:
         else:
             current_y = draw_button('save_game', "Save Game", current_y, config.DARK_GREEN, ui_rects)
             current_y = draw_button('load_game', "Load Game", current_y, config.BLUE, ui_rects)
-            # === ДОБАВЛЯЕМ КНОПКУ Next Wall В РЕЖИМ ИГРЫ !!! ===
+            # === ДОБАВЛЯЕМ КНОПКУ Next Wall В РЕЖИМ ИГРЫ ===
             draw_button('cycle_wall', "Next Wall", current_y, config.PURPLE, ui_rects)
         
         # Сохраняем rect'ы в соответствующий атрибут
@@ -5419,7 +5408,7 @@ class Game:
             }
 
     
-    # !!! =====
+    # === Donate menu ===
 
     def draw_donate_menu(self):
         """Отрисовка меню поддержки проекта"""
@@ -5680,6 +5669,21 @@ class Game:
 
         pygame.quit()
 
+# --- Вспомогательная функция открыть файл DONATE.txt ---
+def open_donation_file():
+
+    filepath = resource_path("DONATE.txt") 
+    
+    if os.path.exists(filepath):
+        if platform.system() == 'Windows':
+            os.startfile(filepath)
+        elif platform.system() == 'Darwin':
+            subprocess.call(['open', filepath])
+        else:
+            # Для Linux используем xdg-open (он есть почти везде)
+            subprocess.call(['xdg-open', filepath])
+    else:
+        print(f"Файл {filepath} не найден!")
 
 # Запуск игры
 if __name__ == "__main__":

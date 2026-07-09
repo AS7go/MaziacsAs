@@ -244,7 +244,12 @@ pip install -r requirements.txt
 ```
 Или вручную: 
 ```bash
-pip install pygame==2.6.1 pyinstaller==6.21.0
+# Основные зависимости для запуска игры
+pip install pygame==2.6.1
+pip install pyperclip==1.11.0
+
+# Для сборки exe (если нужно)
+pip install pyinstaller==6.21.0
 ```
 
 ### 💻 Сборка из исходного кода для Windows
