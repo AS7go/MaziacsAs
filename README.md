@@ -27,6 +27,7 @@
 > 🛠️ **Исходный код (для разработчиков) в директории:** [**Project1**](https://github.com/AS7go/MaziacsAs/tree/main/Project1/)
 > 
 > 📦 **Скачать готовую версию (для игроков):**
+> - **🌐 Официальная страница (itch.io):** [Перейти на MaziacsAs itch.io](https://sh17aleksandr.itch.io/maziacsAs)
 > - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,3 МБ)
 >   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 >
@@ -185,6 +186,7 @@ MaziacsAs — это игра с элементами стратегии и го
 ---
 
 ## 🚀 Установка и запуск
+### 🌐 Официальная страница (itch.io): [Перейти на MaziacsAs itch.io](https://sh17aleksandr.itch.io/maziacsAs)
 
 ### 🖥️ Windows (готовый `.exe`)
 
