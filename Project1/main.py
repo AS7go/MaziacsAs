@@ -74,6 +74,9 @@ class GameConfig:
     # Размеры окна и лабиринта
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 720
+
+    # SCREEN_WIDTH = 630
+    # SCREEN_HEIGHT = 500
     MAZE_WIDTH = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_WIDTH']
     MAZE_HEIGHT = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_HEIGHT']
     # Исходные размеры
@@ -3896,6 +3899,11 @@ class Game:
 
     def toggle_editor_mode(self):
         """Переключение режима редактора"""
+        # === ИСПРАВЛЕНИЕ: Запрещаем переключение в редактор при game_over или game_won ===
+        if self.state.game_over or self.state.game_won:
+            self.set_editor_message("Cannot edit during game over/win!")
+            return
+
         self.state.game_mode = 'editor' if self.state.game_mode == 'game' else 'game'
         self.active_menu_item = None
         self.show_overlay_text = None
@@ -4869,18 +4877,22 @@ class Game:
         
         self.draw_unified_ui(ui_panel_x, self.state.game_mode)
 
-        # ========== GOD MODE В ЦЕНТРЕ ВЕРХНЕЙ ПАНЕЛИ ==========
+        # ========== GOD MODE В ВЕРХНЕЙ ПАНЕЛИ (после всех пунктов меню) ==========
         if self.state.god_mode:
             god_text = self.fonts['ui_header'].render("GOD MODE", True, self.config.GOLD)
-            god_x = (self.config.SCREEN_WIDTH - god_text.get_width()) // 2
+            
+            # Берем правый край последнего пункта меню
+            last_item = self.menu_items[-1]  # "Donate"
+            last_rect = self.menu_rects[last_item]
+            god_x = last_rect.right + int(30 * self.state.scale_factor)
             god_y = (self.info_panel_height - god_text.get_height()) // 2
             
             # Полупрозрачный золотой фон
             bg_rect = pygame.Rect(
-                god_x - 15,
-                god_y - 5,
-                god_text.get_width() + 30,
-                god_text.get_height() + 10
+                god_x - 10,
+                god_y - 3,
+                god_text.get_width() + 20,
+                god_text.get_height() + 6
             )
             bg_surface = pygame.Surface((bg_rect.width, bg_rect.height), pygame.SRCALPHA)
             bg_surface.fill((255, 215, 0, 40))
@@ -4889,6 +4901,7 @@ class Game:
             
             self.screen.blit(god_text, (god_x, god_y))
         # =====================================================
+
 
         # Отрисовка сообщения о паузе по пробелу
         if (self.state.game_paused and 
