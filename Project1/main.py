@@ -28,7 +28,6 @@ pygame.mixer.init()
 
 # --- УСТАНОВКА ИКОНКИ ОКНА ---
 try:
-    # Загружаем именно .ico
     # icon_path = resource_path("icon.ico")
     icon_path = resource_path("icon.png")
     icon_image = pygame.image.load(icon_path)
@@ -75,8 +74,6 @@ class GameConfig:
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 720
 
-    # SCREEN_WIDTH = 630
-    # SCREEN_HEIGHT = 500
     MAZE_WIDTH = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_WIDTH']
     MAZE_HEIGHT = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_HEIGHT']
     # Исходные размеры
@@ -128,16 +125,25 @@ class ResourceManager:
         self.editor_ui_icons = {}
         self.original_images = {}
         self.sounds = {}
+        self.current_style_folder = "img"  # Текущая папка стиля
         
     def load_image(self, filepath):
         """Загрузка изображения с обработкой ошибок"""
-        filepath = resource_path(os.path.join("img", filepath))  # добавляем resource_path
+        # Используем текущую папку стиля
+        filepath = resource_path(os.path.join(self.current_style_folder, filepath))
         if not os.path.exists(filepath):
             return pygame.Surface((32, 32))
         try:
             return pygame.image.load(filepath).convert_alpha()
         except pygame.error as e:
             return pygame.Surface((32, 32))
+
+    def set_style_folder(self, folder_name):
+        """Установка папки со стилем"""
+        if folder_name in ["img", "img1"]:
+            self.current_style_folder = folder_name
+            return True
+        return False
 
     def load_all_images(self):
         """Загрузка всех исходных изображений"""
@@ -190,9 +196,8 @@ class ResourceManager:
             'door': "door.png"
         }
 
-        # === ДОБАВЛЯЕМ ВСЕ ВАРИАНТЫ СТЕН ===
         # Динамически добавляем wall1.png, wall2.png, wall3.png, ...
-        for i in range(1, 34):
+        for i in range(1, 35):
             images_to_load[f'wall{i}'] = f"wall{i}.png"
         
         # Стандартная стена (запасной вариант)
@@ -294,9 +299,6 @@ class Player:
 
     def get_image(self, resource_manager, game_over=False, show_death_image=False):
             """Получение текущего изображения игрока"""
-            if game_over and show_death_image:
-                return resource_manager.scaled_images.get('rip')
-            
             current_time = pygame.time.get_ticks()
             if self.is_moving and current_time - self.last_frame_change_time >= GameConfig.PLAYER_ANIMATION_SPEED:
                 self.current_frame_index = (self.current_frame_index + 1) % 3  # 3 кадра анимации
@@ -624,7 +626,6 @@ class Game:
             7: "NIGHTMARE"
         }
 
-        # Для навигации по меню FREE PLAY - Выбор Level
         self.level_navigation_index = 0
         self.screen = None
         self.cell_size = self.config.ORIGINAL_CELL_SIZE
@@ -633,23 +634,15 @@ class Game:
         self.visible_maze_width = 0
         self.visible_maze_height = 0
         self.fonts = {}
-        
-        # Добавлена поверхность для лабиринта
         self.labyrinth_surface = None
-        
         self.clock = pygame.time.Clock()
-        
-        # Увеличена частота кадров и скорректированы задержки
-        self.FPS = 12  # При большом FPS управление от клавиш усложняется (мгновенное срабатывание)
+        self.FPS = 12 
         self.move_delay = 0.0
-        self.swap_delay = 0.3
-        
+        self.swap_delay = 0.3   
         self.last_move_time = time.time()
         self.last_swap_time = 0.0
         self.spider_move_counter = 0
-        
         self.spider_speed = DIFFICULTY_LEVELS[self.current_difficulty]['spider_SPEED']
-
         self.current_spider_image_index = 0
         self.last_spider_image_change_time = 0
         self.current_map_pointer_index = 0
@@ -660,7 +653,6 @@ class Game:
         self.active_menu_item = None
         self.show_overlay_text = None
         self.menu_open_with_keyboard = False
-        
         self.instruction_text = [
             "--- CONTROLS ---",
             "Arrow Keys (Up, Down, Left, Right) or WASD: Move/Navigation Menu",
@@ -729,8 +721,40 @@ class Game:
         self.mouse_move_item_to_take = None
         self.exit_dialog_selected_button = 'cancel'  # По умолчанию Cancel выделен
         self.enter_dialog_selected_button = 'cancel'  # По умолчанию Cancel выделен
-
         self.current_wall_image = 'wall'  # По умолчанию стандартная стена
+        self.current_style = "img"  # Текущая папка со стилем
+        self.style_options = ["img", "img1"]  # Доступные стили
+        self.style_display_names = {"img": "Style 1", "img1": "Style 2"}
+
+    def switch_style(self):
+        """Переключение стиля оформления между img и img1"""
+        # Определяем новую папку
+        if self.current_style == "img":
+            new_style = "img1"
+            style_name = "Style 2"
+        else:
+            new_style = "img"
+            style_name = "Style 1"
+        
+        # Обновляем папку в ResourceManager
+        self.resource_manager.current_style_folder = new_style
+        
+        # Перезагружаем все изображения
+        self.resource_manager.load_all_images()
+        self.resource_manager.scale_images(self.cell_size, self.state.scale_factor)
+        
+        # Обновляем текущий стиль
+        self.current_style = new_style
+        
+        # Обновляем иконку стены
+        self.update_wall_icon()
+        
+        # Сообщение пользователю
+        self.set_editor_message(f"Style changed to: {style_name}")
+        
+        # Очищаем кэш UI текстов
+        self.ui_text_cache.clear()
+        self.last_cached_scale = None
 
     def handle_campaign_interaction(self, current_time):
         """Универсальная обработка взаимодействия с кампанией"""
@@ -848,7 +872,6 @@ class Game:
         for key in cache_keys:
             del self.resource_manager.scaled_images[key]
 
-
     # === Стили стены по кругу ===
     def cycle_wall_style(self, direction=1):
         """
@@ -857,7 +880,7 @@ class Game:
         """
         # Получаем все доступные стили стен 
         wall_styles = []
-        for i in range(1, 34): # стены wall1.png, wall2.png, wall3.png, ...
+        for i in range(1, 35): # стены wall1.png, wall2.png, wall3.png, ...
             key = f'wall{i}'
             if key in self.resource_manager.scaled_images:
                 wall_styles.append(key)
@@ -1100,9 +1123,7 @@ class Game:
             self.config.MAZE_HEIGHT = diff_params['MAZE_HEIGHT']
             self.config.time_TIMER_MAX = diff_params['time_TIMER_MAX']
             self.config.time_BONUS_TIME = diff_params['time_BONUS_TIME']
-            
             self.spider_speed = diff_params['spider_SPEED']
-
             self.maze = Maze(self.config.MAZE_WIDTH, self.config.MAZE_HEIGHT)
 
         # 2. Загрузка списков
@@ -1158,7 +1179,7 @@ class Game:
         """Универсальное сохранение в JSON"""
         try:
             with open(filename, 'w') as f:
-                json.dump(data, f, indent=2) # indent=2 меньше занимает места чем 4
+                json.dump(data, f, indent=2)
             self.set_editor_message(success_message)
             return True
         except Exception as e:
@@ -1251,7 +1272,6 @@ class Game:
                 self.cycle_wall_style(1)  # Вместо get_random_wall_image()
         else:
             self.cycle_wall_style(1)  # Вместо get_random_wall_image()
-
         # =================================================================================
             
         self.set_editor_message(f"Map loaded: {filename}")
@@ -1627,7 +1647,7 @@ class Game:
                     pause_duration = current_time - self.state.pause_start_time
                     self.state.last_timer_update += pause_duration
                     self.state.pause_start_time = None
-                self.state.game_paused = False
+                self.state.game_paused = False  # Снимаем паузу
                 self.state.pause_type = None
 
     def draw_combined_dialog(self):
@@ -2215,7 +2235,7 @@ class Game:
             # ========== ВЫБИРАЕМ СЛЕДУЮЩУЮ СТЕНУ ПО КРУГУ ==========
             if not keep_wall_style: 
                 self.cycle_wall_style(1)    
-            # ===========================================================
+            # =======================================================
 
             if map_filename:
                 if not map_filename.endswith('.map'):
@@ -2468,6 +2488,139 @@ class Game:
         # Золотая аура
         pygame.draw.circle(surface, self.config.GOLD, (center_x, center_y), cell_size // 2 + 5, 3)
 
+    # !!! Единая функция отрисовки всех игровых объектов 
+    def draw_game_objects(self, surface, cell_size, offset_x, offset_y, 
+                        scale=False, visibility_bounds=None):
+        """
+        Единая функция отрисовки всех игровых объектов
+            
+        Args:
+            surface: поверхность для отрисовки
+            cell_size: размер клетки
+            offset_x, offset_y: смещение
+            scale: нужно ли масштабировать изображения
+            visibility_bounds: (start_row, end_row, start_col, end_col) или None
+        """
+            
+        def is_visible(row, col):
+            """Проверка видимости объекта"""
+            if visibility_bounds is None:
+                return True
+            start_row, end_row, start_col, end_col = visibility_bounds
+            return (start_row <= row < end_row and start_col <= col < end_col)
+            
+        def is_valid_position(pos):
+            """Проверка валидности позиции в лабиринте"""
+            if not pos:
+                return False
+            return (0 <= pos[0] < len(self.maze.grid) and 
+                    0 <= pos[1] < len(self.maze.grid[0]))
+        
+        def draw_element(image, pos, scale=False):
+            """Универсальная отрисовка элемента"""
+            if not pos or not image:
+                return
+            row, col = pos
+            
+            # Проверка видимости
+            if not is_visible(row, col):
+                return
+                
+            img = image
+            if scale:
+                img = pygame.transform.scale(image, (cell_size, cell_size))
+                
+            rect = img.get_rect(center=(
+                col * cell_size + cell_size // 2 + offset_x,
+                row * cell_size + cell_size // 2 + offset_y
+            ))
+            surface.blit(img, rect)
+        
+        # --- ОТРИСОВКА МЕЧЕЙ ---
+        for sword_pos in self.maze.swords_positions:
+            if not is_valid_position(sword_pos):
+                continue
+            if self.maze.grid[sword_pos[0]][sword_pos[1]] != 1:
+                continue
+                
+            # Проверка на группу мечей у дома
+            if (hasattr(self.maze, 'house_sword_position') and 
+                self.maze.house_sword_position is not None and 
+                sword_pos[0] == self.maze.house_sword_position[0] and 
+                sword_pos[1] == self.maze.house_sword_position[1]):
+                
+                swords_in_position = self.maze.swords_positions.count(self.maze.house_sword_position)
+                image_key = 'swords' if swords_in_position > 1 else 'sword'
+            else:
+                image_key = 'sword'
+                
+            draw_element(self.resource_manager.scaled_images.get(image_key), sword_pos, scale)
+        
+        # --- ОТРИСОВКА ВРЕМЕНИ ---
+        for time_pos in self.maze.times_positions:
+            if is_valid_position(time_pos) and self.maze.grid[time_pos[0]][time_pos[1]] == 1:
+                draw_element(self.resource_manager.scaled_images.get('time'), time_pos, scale)
+        
+        # --- ОТРИСОВКА УКАЗАТЕЛЕЙ ---
+        for pointer_pos in self.maze.path_pointers_positions:
+            if is_valid_position(pointer_pos) and self.maze.grid[pointer_pos[0]][pointer_pos[1]] == 1:
+                frame_key = 'map' if self.current_map_pointer_index == 0 else 'map1'
+                draw_element(self.resource_manager.scaled_images.get(frame_key), pointer_pos, scale)
+        
+        # --- ОТРИСОВКА КЛАДА ---
+        if (self.maze.treasure_position and 
+            is_valid_position(self.maze.treasure_position) and 
+            self.maze.grid[self.maze.treasure_position[0]][self.maze.treasure_position[1]] == 1):
+            draw_element(self.resource_manager.scaled_images.get('treasure'), 
+                        self.maze.treasure_position, scale)
+        
+        # --- ОТРИСОВКА ДОМА ---
+        house_pos = (self.config.HOUSE_X, self.config.HOUSE_Y)
+        if is_valid_position(house_pos) and self.maze.grid[house_pos[0]][house_pos[1]] == 0:
+            draw_element(self.resource_manager.scaled_images.get('house'), house_pos, scale)
+        
+        # --- ОТРИСОВКА ИГРОКА (если не game_over) ---
+        player_pos = (self.player.x, self.player.y)
+        if (is_valid_position(player_pos) and 
+            self.maze.grid[self.player.x][self.player.y] == 0 and
+            not self.state.game_over):
+            player_img = self.player.get_image(self.resource_manager, False, False)
+            if player_img:
+                draw_element(player_img, player_pos, scale)
+        
+        # --- ОТРИСОВКА ПАУКОВ ---
+        for spider in self.maze.spiders:
+            spider_pos = (spider.x, spider.y)
+            if not is_valid_position(spider_pos):
+                continue
+            if self.maze.grid[spider.x][spider.y] != 0:
+                continue
+                
+            if not spider.defeated:
+                # Живой паук
+                img = self.resource_manager.scaled_images.get(f'spider{"" if self.current_spider_image_index == 0 else "1"}')
+                draw_element(img, spider_pos, scale)
+            elif spider.defeated_time > 0:
+                # Мертвый паук
+                elapsed = time.time() - spider.defeated_time
+                if elapsed < self.config.SPIDER_DEATH_ANIMATION_DURATION:
+                    # Специальная анимация: игрок на месте паука
+                    if (self.player.x == spider.x and self.player.y == spider.y and
+                        not self.state.game_over and not self.state.game_won):
+                        frame_index = int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2
+                        frame_key = 'player_killed_spider1' if frame_index == 0 else 'player_killed_spider2'
+                        img = self.resource_manager.scaled_images.get(frame_key)
+                    else:
+                        frame = 'spider_dead1' if int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2 == 0 else 'spider_dead2'
+                        img = self.resource_manager.scaled_images.get(frame)
+                    draw_element(img, spider_pos, scale)
+        
+        # --- ОТРИСОВКА RIP (всегда поверх всего) ---
+        if self.state.game_over:
+            rip_img = self.resource_manager.scaled_images.get('rip')
+            if rip_img:
+                draw_element(rip_img, player_pos, scale)
+
     def draw_map(self, surface, mode="game", cell_size=32, offset=(0, 0), show_editor_ui=True):
         """Отрисовка карты с оптимизацией для больших размеров"""
         ox, oy = offset
@@ -2488,18 +2641,7 @@ class Game:
         else:
             actual_cell_size = cell_size
 
-        def draw_element(image, pos, scale=False):
-            if not pos or not image:
-                return
-            img = image
-            if scale:
-                img = pygame.transform.scale(image, (actual_cell_size, actual_cell_size))
-            rect = img.get_rect(center=(
-                pos[1] * actual_cell_size + actual_cell_size // 2 + ox,
-                pos[0] * actual_cell_size + actual_cell_size // 2 + oy
-            ))
-            surface.blit(img, rect)
-
+        # 1. Отрисовка стен, проходов и дверей
         for row in range(len(self.maze.grid)):
             for col in range(len(self.maze.grid[row])):
                 draw_x = col * actual_cell_size + ox
@@ -2528,7 +2670,7 @@ class Game:
                             wall_img = pygame.transform.scale(wall_img, (actual_cell_size, actual_cell_size))
                         surface.blit(wall_img, (draw_x, draw_y))
 
-        # Отрисовка пути
+        # 2. Отрисовка пути (если включен)
         if self.state.show_path:
             path_to_follow = self.find_path_to_follow()
             if path_to_follow:
@@ -2538,94 +2680,12 @@ class Game:
                     self.draw_path(surface, path_to_follow, self.config.YELLOW, actual_cell_size, ox, oy)
                     self.draw_minimap_path(surface, path_to_follow, self.config.YELLOW, actual_cell_size, ox, oy)
 
-        # Вспомогательная функция для проверки позиций
-        def is_valid_position(pos):
-            return (0 <= pos[0] < len(self.maze.grid) and 
-                    0 <= pos[1] < len(self.maze.grid[0]))
-        scale = (mode == "editor")
+        # 3. Отрисовка всех игровых объектов (ЕДИНАЯ ФУНКЦИЯ!)
+        self.draw_game_objects(surface, actual_cell_size, ox, oy, scale=(mode == "editor"),
+            visibility_bounds=None  # Все объекты, без ограничений видимости
+        )
 
-        # Отрисовка объектов на стенах
-        for sword_pos in self.maze.swords_positions:
-            if is_valid_position(sword_pos) and self.maze.grid[sword_pos[0]][sword_pos[1]] == 1:
-                # Проверяем, это позиция с мечами возле дома?
-                if (hasattr(self.maze, 'house_sword_position') and 
-                    self.maze.house_sword_position is not None and 
-                    sword_pos[0] == self.maze.house_sword_position[0] and 
-                    sword_pos[1] == self.maze.house_sword_position[1]):
-
-                    # Считаем сколько мечей осталось в этой позиции
-                    swords_in_position = self.maze.swords_positions.count(self.maze.house_sword_position)
-
-                    if swords_in_position > 1:
-                        # Если больше 1 меча - используем специальное изображение
-                        draw_element(self.resource_manager.scaled_images.get('swords'), sword_pos, scale)
-                    else:
-                        # Если 1 меч или меньше - используем обычное изображение
-                        draw_element(self.resource_manager.scaled_images.get('sword'), sword_pos, scale)
-                else:
-                    # Обычные мечи
-                    draw_element(self.resource_manager.scaled_images.get('sword'), sword_pos, scale)
-
-        for time_pos in self.maze.times_positions:
-            if is_valid_position(time_pos) and self.maze.grid[time_pos[0]][time_pos[1]] == 1:
-                draw_element(self.resource_manager.scaled_images.get('time'), time_pos, scale)
-
-        for pointer_pos in self.maze.path_pointers_positions:
-            if is_valid_position(pointer_pos) and self.maze.grid[pointer_pos[0]][pointer_pos[1]] == 1:
-                frame_key = 'map' if self.current_map_pointer_index == 0 else 'map1'
-                draw_element(self.resource_manager.scaled_images.get(frame_key), pointer_pos, scale)
-
-        # Клад
-        if (self.maze.treasure_position and 
-            is_valid_position(self.maze.treasure_position) and 
-            self.maze.grid[self.maze.treasure_position[0]][self.maze.treasure_position[1]] == 1):
-            draw_element(self.resource_manager.scaled_images.get('treasure'), self.maze.treasure_position, scale)
-
-        # Отрисовка объектов на путях
-        house_pos = (self.config.HOUSE_X, self.config.HOUSE_Y)
-        if (is_valid_position(house_pos) and 
-            self.maze.grid[house_pos[0]][house_pos[1]] == 0):
-            draw_element(self.resource_manager.scaled_images.get('house'), house_pos, scale)
-
-        # Игрок
-        player_pos = (self.player.x, self.player.y)
-        if (is_valid_position(player_pos) and 
-            self.maze.grid[self.player.x][self.player.y] == 0):
-            player_img = self.player.get_image(self.resource_manager, self.state.game_over, self.state.show_death_image)
-            if player_img:
-                draw_element(player_img, player_pos, scale)
-
-        # Пауки
-        for spider in self.maze.spiders:
-            spider_pos = (spider.x, spider.y)
-            if (is_valid_position(spider_pos) and 
-                self.maze.grid[spider.x][spider.y] == 0):
-                
-                if not spider.defeated:
-                    # Живой паук
-                    img = self.resource_manager.scaled_images.get(f'spider{"" if self.current_spider_image_index == 0 else "1"}')
-                    draw_element(img, spider_pos, scale)
-                
-                elif spider.defeated_time > 0:
-                    # Убитый паук
-                    elapsed = time.time() - spider.defeated_time
-                    
-                    if elapsed < self.config.SPIDER_DEATH_ANIMATION_DURATION:
-                        # === НОВАЯ ПРОВЕРКА: игрок стоит на месте убитого паука? ===
-                        if (self.player.x == spider.x and self.player.y == spider.y and
-                            not self.state.game_over and not self.state.game_won):
-                            # Специальная анимация: игрок на месте паука
-                            frame_index = int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2
-                            frame_key = 'player_killed_spider1' if frame_index == 0 else 'player_killed_spider2'
-                            img = self.resource_manager.scaled_images.get(frame_key)
-                            draw_element(img, spider_pos, scale)
-                        else:
-                            # Обычная анимация смерти паука
-                            frame = 'spider_dead1' if int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2 == 0 else 'spider_dead2'
-                            img = self.resource_manager.scaled_images.get(frame)
-                            draw_element(img, spider_pos, scale)
-
-        # Отрисовка GOD MODE индикатора
+        # 4. Отрисовка GOD MODE индикатора
         self.draw_god_mode_indicator(surface, actual_cell_size, ox, oy)
 
     def draw_visible_area_only(self, surface, cell_size, offset_x, offset_y):
@@ -2636,19 +2696,19 @@ class Game:
         blit = surface.blit
         draw_rect = pygame.draw.rect
         path_color = self.config.PATH_COLOR
-        # wall_img = scaled_images.get('wall')
         wall_img = scaled_images.get(self.current_wall_image, scaled_images.get('wall'))
         door_img = scaled_images.get('door')
         extra_paths = getattr(self.maze, 'extra_paths', set())
 
+        # Расчет видимой области
         start_col = max(0, (-offset_x) // cell_size - 1)
         end_col = min(len(grid[0]), (self.visible_maze_width - offset_x) // cell_size + 1)
         start_row = max(0, (-offset_y) // cell_size - 1)
         end_row = min(len(grid), (self.visible_maze_height - offset_y) // cell_size + 1)
         
-        # 1. Отрисовываем стены, пол и двери
+        # 1. Отрисовываем стены, пол и двери (только видимая область)
         for row in range(start_row, end_row):
-            draw_y = row * cell_size + offset_y  # вынесли из внутреннего цикла
+            draw_y = row * cell_size + offset_y
             
             for col in range(start_col, end_col):
                 draw_x = col * cell_size + offset_x
@@ -2672,19 +2732,20 @@ class Game:
                     if wall_img:
                         blit(wall_img, (draw_x, draw_y))
         
-        # 2. Отрисовка пути ПЕРЕД объектами
+        # 2. Отрисовка пути ПЕРЕД объектами (только видимая область)
         if self.state.show_path:
             path_to_follow = self.find_path_to_follow()
             if path_to_follow:
+                # Используем существующий метод draw_path (он сам проверит видимость)
                 self.draw_path(surface, path_to_follow, self.config.YELLOW, cell_size, offset_x, offset_y)
         
-        # 3. Отрисовка объектов ПОСЛЕ пути
-        self.draw_objects_in_visible_area(surface, cell_size, offset_x, offset_y, 
-                                        start_row, end_row, start_col, end_col)
+        # 3. Отрисовка объектов ПОСЛЕ пути (ЕДИНАЯ ФУНКЦИЯ с проверкой видимости!)
+        self.draw_game_objects(surface, cell_size, offset_x, offset_y, scale=False,
+            visibility_bounds=(start_row, end_row, start_col, end_col)
+        )
         
         # 4. Отрисовка GOD MODE индикатора
         self.draw_god_mode_indicator(surface, cell_size, offset_x, offset_y)
-
 
     def draw_path(self, surface, path, color, cell_size, offset_x=0, offset_y=0):
         """Отрисовка пути с оптимизацией для больших лабиринтов"""
@@ -2719,109 +2780,7 @@ class Game:
                 
             pygame.draw.circle(surface, color, (int(draw_x), int(draw_y)), 
                             max(3, int(5 * self.state.scale_factor)))
-
-    def draw_objects_in_visible_area(self, surface, cell_size, offset_x, offset_y, 
-                                    start_row, end_row, start_col, end_col):
-        """Отрисовка объектов только в видимой области"""
-        
-        def draw_element(image, pos, scale=False):
-            if not pos or not image:
-                return
-            row, col = pos
-            
-            # Проверяем что объект в видимой области
-            if not (start_row <= row < end_row and start_col <= col < end_col):
-                return
-                
-            img = image
-            if scale:
-                img = pygame.transform.scale(image, (cell_size, cell_size))
-            rect = img.get_rect(center=(
-                col * cell_size + cell_size // 2 + offset_x,
-                row * cell_size + cell_size // 2 + offset_y
-            ))
-            surface.blit(img, rect)
-        
-        # Отрисовка объектов на стенах (только в видимой области)
-        for sword_pos in self.maze.swords_positions:
-            if (0 <= sword_pos[0] < len(self.maze.grid) and 
-                0 <= sword_pos[1] < len(self.maze.grid[0]) and 
-                self.maze.grid[sword_pos[0]][sword_pos[1]] == 1):
-                
-                # Проверяем это позиция с группой мечей возле дома?
-                if (hasattr(self.maze, 'house_sword_position') and 
-                    self.maze.house_sword_position is not None and 
-                    sword_pos[0] == self.maze.house_sword_position[0] and 
-                    sword_pos[1] == self.maze.house_sword_position[1]):
-                    
-                    swords_in_position = self.maze.swords_positions.count(self.maze.house_sword_position)
-                    if swords_in_position > 1:
-                        draw_element(self.resource_manager.scaled_images.get('swords'), sword_pos)
-                    else:
-                        draw_element(self.resource_manager.scaled_images.get('sword'), sword_pos)
-                else:
-                    draw_element(self.resource_manager.scaled_images.get('sword'), sword_pos)
-        
-        for time_pos in self.maze.times_positions:
-            if (0 <= time_pos[0] < len(self.maze.grid) and 
-                0 <= time_pos[1] < len(self.maze.grid[0]) and 
-                self.maze.grid[time_pos[0]][time_pos[1]] == 1):
-                draw_element(self.resource_manager.scaled_images.get('time'), time_pos)
-        
-        for pointer_pos in self.maze.path_pointers_positions:
-            if (0 <= pointer_pos[0] < len(self.maze.grid) and 
-                0 <= pointer_pos[1] < len(self.maze.grid[0]) and 
-                self.maze.grid[pointer_pos[0]][pointer_pos[1]] == 1):
-                frame_key = 'map' if self.current_map_pointer_index == 0 else 'map1'
-                draw_element(self.resource_manager.scaled_images.get(frame_key), pointer_pos)
-        
-        # Клад
-        if (self.maze.treasure_position and 
-            0 <= self.maze.treasure_position[0] < len(self.maze.grid) and 
-            0 <= self.maze.treasure_position[1] < len(self.maze.grid[0]) and 
-            self.maze.grid[self.maze.treasure_position[0]][self.maze.treasure_position[1]] == 1):
-            draw_element(self.resource_manager.scaled_images.get('treasure'), self.maze.treasure_position)
-        
-        # Дом
-        house_pos = (self.config.HOUSE_X, self.config.HOUSE_Y)
-        if (0 <= house_pos[0] < len(self.maze.grid) and 
-            0 <= house_pos[1] < len(self.maze.grid[0]) and 
-            self.maze.grid[house_pos[0]][house_pos[1]] == 0):
-            draw_element(self.resource_manager.scaled_images.get('house'), house_pos)
-        
-        # Игрок
-        player_pos = (self.player.x, self.player.y)
-        if (0 <= player_pos[0] < len(self.maze.grid) and 
-            0 <= player_pos[1] < len(self.maze.grid[0]) and 
-            self.maze.grid[self.player.x][self.player.y] == 0):
-            player_img = self.player.get_image(self.resource_manager, self.state.game_over, self.state.show_death_image)
-            if player_img:
-                draw_element(player_img, player_pos)
-        
-        # пауки
-        for spider in self.maze.spiders:
-            spider_pos = (spider.x, spider.y)
-            if (0 <= spider_pos[0] < len(self.maze.grid) and 
-                0 <= spider_pos[1] < len(self.maze.grid[0]) and 
-                self.maze.grid[spider.x][spider.y] == 0):
-                
-                if not spider.defeated:
-                    img = self.resource_manager.scaled_images.get(f'spider{"" if self.current_spider_image_index == 0 else "1"}')
-                    draw_element(img, spider_pos)
-                
-                elif spider.defeated_time > 0:
-                    elapsed = time.time() - spider.defeated_time
-                    if elapsed < self.config.SPIDER_DEATH_ANIMATION_DURATION:
-                        if (self.player.x == spider.x and self.player.y == spider.y and
-                            not self.state.game_over and not self.state.game_won):
-                            frame_index = int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2
-                            frame_key = 'player_killed_spider1' if frame_index == 0 else 'player_killed_spider2'
-                            img = self.resource_manager.scaled_images.get(frame_key)
-                            draw_element(img, spider_pos)
-                        else:
-                            frame = 'spider_dead1' if int(elapsed / self.config.SPIDER_DEATH_ANIMATION_SPEED) % 2 == 0 else 'spider_dead2'
-                            img = self.resource_manager.scaled_images.get(frame)
-                            draw_element(img, spider_pos)
+    # !!! Малые и большие карты оптимизированы
 
     def handle_events(self):
         """Обработка событий (поддерживает плавное изменение размера по диагонали)."""
@@ -3286,10 +3245,8 @@ class Game:
                 if self.player.has_sword:
                     self.player.has_sword = False
                     self.player.has_treasure = True
-                    
                     self.maze.swords_positions.append(item_pos)
                     self.maze.swords_set.add(item_pos)
-                    
                     self.maze.treasure_position = None
                     self.play_take_sound()
                 elif not self.player.has_treasure:
@@ -3523,6 +3480,7 @@ class Game:
                 {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
                 {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
                 {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
+                {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
                 {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
                 {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
                 {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
@@ -3616,7 +3574,7 @@ class Game:
             self.spider_speed = DIFFICULTY_LEVELS[self.current_difficulty]['spider_SPEED']
 
     def toggle_fps(self):
-        """Циклическое переключение FPS"""
+        """Циклическое переключение FPS скорость игры"""
         fps_options = [10, 11, 12, 13, 14, 15, 16,17,18,19,20,30,60]
         try:
             current_index = fps_options.index(self.FPS)
@@ -4012,10 +3970,10 @@ class Game:
                         self.active_menu_item = None
                         self.menu_navigation_index = 0
                     else:
-                        self.menu_navigation_index = (self.menu_navigation_index - 1) % 11
+                        self.menu_navigation_index = (self.menu_navigation_index - 1) % 12
                     return
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.menu_navigation_index = (self.menu_navigation_index + 1) % 11
+                    self.menu_navigation_index = (self.menu_navigation_index + 1) % 12
                     return
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     # Стрелка вправо в подменю переходит к следующему пункту горизонтального меню
@@ -4173,14 +4131,15 @@ class Game:
         """Выполнение выбранного действия в меню"""
         current_time = time.time()
         menu_actions = [
-            {"name": "New Game", "action": lambda: self.reset_game()},
+            {"name": "New Game", "action": lambda: self.reset_game(keep_wall_style=False)},
             {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
             {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
             {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
-            {"name": "Sound", "action": lambda: self.toggle_sound()},
-            {"name": "Game Speed", "action": lambda: self.toggle_fps()},
-            {"name": "Spiders Speed", "action": lambda: self.toggle_spider_speed()},
-            {"name": "Timer", "action": lambda: self.toggle_time_timer()},
+            {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
+            {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
+            {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
+            {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
+            {"name": f"Timer: {'ON' if self.state.time_timer_enabled else 'OFF'}", "action": lambda: self.toggle_time_timer()},
             {"name": "Save Map", "action": lambda: self.show_save_dialog_handler()},
             {"name": "Load Map", "action": lambda: self.show_load_dialog_handler()},
             {"name": "Exit", "action": lambda: self.quit_game()}
@@ -4190,8 +4149,9 @@ class Game:
             action = menu_actions[self.menu_navigation_index]["action"]
             action()
         
-        # Закрываем меню только для определенных действий
-        if self.menu_navigation_index not in [1, 2, 4, 5, 6, 7, 8, 9]:  # Не закрываем для диалогов 1,2-Save/Load Game, 4-Sound, 5—Speed 6-Timer,7-spider Speed, 8,9—Save/Load Map
+        # Закрываем меню только для определенных действий. Индексы 12 (0-11)
+        # Не закрываем для: Save Game(1), Load Game(2), Style(4), Sound(5), Game Speed(6), Timer(7), Spiders Speed(8), Save Map(9), Load Map(10)
+        if self.menu_navigation_index not in [1, 2, 4, 5, 6, 7, 8, 9, 10]:
             # ПРИ ЯВНОМ ВЫБОРЕ "NEW GAME" СБРАСЫВАЕМ СЧЕТЧИК КАРТ
             if self.menu_navigation_index == 0:
                 self.state.maps_completed = 0
@@ -4578,6 +4538,7 @@ class Game:
                 {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
                 {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
                 {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
+                {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
                 {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
                 {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
                 {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
@@ -4902,7 +4863,6 @@ class Game:
             self.screen.blit(god_text, (god_x, god_y))
         # =====================================================
 
-
         # Отрисовка сообщения о паузе по пробелу
         if (self.state.game_paused and 
             self.state.pause_type == 'space_pause' and 
@@ -5125,7 +5085,7 @@ class Game:
         self.screen.blit(text_background, text_bg_rect)
 
         # Мигающий текст "GAME OVER"
-        blink_factor = (math.sin(time.time() * 5) + 1) / 2  # от 0 до 1
+        blink_factor = (math.sin(time.time() * 5) + 1) / 2 
         color_intensity = int(155 + 100 * blink_factor)
         game_over_color = (255, color_intensity, color_intensity)  # мигающий красный
         
@@ -5257,7 +5217,6 @@ class Game:
         
         # Перезапускаем игру с новыми параметрами
         self.reset_game(keep_wall_style=False)  # Меняем стену
-
 
     def handle_campaign_win(self):
         """Обработка победы в кампании"""
@@ -5419,10 +5378,8 @@ class Game:
                 'left': pygame.Rect(dialog_x + left_rect.x, dialog_y + left_rect.y, btn_w, btn_h),
                 'right': pygame.Rect(dialog_x + right_rect.x, dialog_y + right_rect.y, btn_w, btn_h)
             }
-
     
     # === Donate menu ===
-
     def draw_donate_menu(self):
         """Отрисовка меню поддержки проекта"""
         # Затемняем фон
@@ -5521,8 +5478,6 @@ class Game:
             msg_surface.blit(msg_text, msg_rect)
             
             # Позиционируем между предупреждением и кнопкой BACK
-            # BACK находится на dialog_height - 70, предупреждение заканчивается на warning_y + 45 + 20
-            # Считаем середину между ними
             warning_bottom = warning_y + int(45 * self.state.scale_factor) + int(20 * self.state.scale_factor)
             back_top = dialog_height - int(70 * self.state.scale_factor)
             msg_y = warning_bottom + (back_top - warning_bottom - msg_height) // 2
