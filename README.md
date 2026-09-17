@@ -263,7 +263,6 @@ pip install pyinstaller==6.21.0
 
 ```bash
 pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.ico" --add-data "img;img" --add-data "img1;img1" --add-data "sound;sound" --add-data "icon.png;." main.py
-
 ```
 
 ### 🐧 Сборка из исходного кода для Linux
@@ -274,7 +273,7 @@ pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.ico" --add-data
 4. Выполните команду:
 
 ```bash
-pyinstaller --onedir --noconsole --name "MaziacsAs" --add-data "img:img" --add-data "sound:sound" --add-data "icon.png:." main.py
+pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.png" --add-data "img:img" --add-data "img1:img1" --add-data "sound:sound" --add-data "icon.png:." main.py
 ```
 
 > **Примечание:** В Linux файл `icon.png` используется для иконки окна игры. Сам исполняемый файл не может иметь собственную иконку, как это реализовано в Windows.
