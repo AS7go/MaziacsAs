@@ -262,7 +262,8 @@ pip install pyinstaller==6.21.0
 4. Выполните команду:
 
 ```bash
-pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.ico" --add-data "img;img" --add-data "sound;sound" --add-data "icon.png;." main.py
+pyinstaller --onedir --noconsole --name "MaziacsAs" --icon "icon.ico" --add-data "img;img" --add-data "img1;img1" --add-data "sound;sound" --add-data "icon.png;." main.py
+
 ```
 
 ### 🐧 Сборка из исходного кода для Linux
