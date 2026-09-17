@@ -74,6 +74,10 @@ class GameConfig:
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 720
 
+    # Cover 630x500 image для https://itch.io
+    # SCREEN_WIDTH = 630
+    # SCREEN_HEIGHT = 500
+
     MAZE_WIDTH = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_WIDTH']
     MAZE_HEIGHT = DIFFICULTY_LEVELS[CURRENT_DIFFICULTY]['MAZE_HEIGHT']
     # Исходные размеры
@@ -197,7 +201,7 @@ class ResourceManager:
         }
 
         # Динамически добавляем wall1.png, wall2.png, wall3.png, ...
-        for i in range(1, 35):
+        for i in range(1, 37):
             images_to_load[f'wall{i}'] = f"wall{i}.png"
         
         # Стандартная стена (запасной вариант)
@@ -724,17 +728,17 @@ class Game:
         self.current_wall_image = 'wall'  # По умолчанию стандартная стена
         self.current_style = "img"  # Текущая папка со стилем
         self.style_options = ["img", "img1"]  # Доступные стили
-        self.style_display_names = {"img": "Style 1", "img1": "Style 2"}
+        self.style_display_names = {"img": "new", "img1": "old"}
 
     def switch_style(self):
         """Переключение стиля оформления между img и img1"""
         # Определяем новую папку
         if self.current_style == "img":
             new_style = "img1"
-            style_name = "Style 2"
+            style_name = "old"
         else:
             new_style = "img"
-            style_name = "Style 1"
+            style_name = "new"
         
         # Обновляем папку в ResourceManager
         self.resource_manager.current_style_folder = new_style
@@ -880,7 +884,7 @@ class Game:
         """
         # Получаем все доступные стили стен 
         wall_styles = []
-        for i in range(1, 35): # стены wall1.png, wall2.png, wall3.png, ...
+        for i in range(1, 37): # стены wall1.png, wall2.png, wall3.png, ...
             key = f'wall{i}'
             if key in self.resource_manager.scaled_images:
                 wall_styles.append(key)
@@ -982,6 +986,7 @@ class Game:
         # Устанавливаем начальный масштаб
         base_width = 1280
         base_height = 720
+        
         width_scale = self.config.SCREEN_WIDTH / base_width
         height_scale = self.config.SCREEN_HEIGHT / base_height
         self.state.scale_factor = min(width_scale, height_scale)
@@ -2458,7 +2463,7 @@ class Game:
     def quit_game(self):
         """Выход из игры"""
         pygame.quit()
-        exit()
+        sys.exit()
 
     def draw_minimap_path(self, surface, path, color, map_cell_size, offset_x, offset_y):
         """Отрисовка пути на миникарте в режиме редактирования"""
@@ -3480,7 +3485,7 @@ class Game:
                 {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
                 {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
                 {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
-                {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
+                {"name": f"Style: {'new' if self.current_style == 'img' else 'old'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
                 {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
                 {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
                 {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
@@ -4135,7 +4140,7 @@ class Game:
             {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
             {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
             {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
-            {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
+            {"name": f"Style: {'new' if self.current_style == 'img' else 'old'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
             {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
             {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
             {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
@@ -4538,7 +4543,7 @@ class Game:
                 {"name": "Save Game", "action": lambda: self.show_save_game_dialog()},
                 {"name": "Load Game", "action": lambda: self.show_load_game_dialog()},
                 {"name": "Edit Map", "action": lambda: self.toggle_editor_mode()},
-                {"name": f"Style: {'Style 1' if self.current_style == 'img' else 'Style 2'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
+                {"name": f"Style: {'new' if self.current_style == 'img' else 'old'}", "action": lambda: self.switch_style()},  # <-- НОВЫЙ ПУНКТ
                 {"name": "Sound: ON" if self.sound_enabled else "Sound: OFF", "action": lambda: self.toggle_sound()},
                 {"name": f"Game Speed: {self.FPS}", "action": lambda: self.toggle_fps()},
                 {"name": f"Spiders Speed: {self.spider_speed}", "action": lambda: self.toggle_spider_speed()},
