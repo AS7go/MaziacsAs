@@ -28,7 +28,7 @@
 > 
 > 📦 **Скачать готовую версию (для игроков):**
 > - **🌐 Официальная страница (itch.io):** [Перейти на MaziacsAs itch.io](https://sh17aleksandr.itch.io/maziacsAs)
-> - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~19,3 МБ)
+> - **🖥️ Windows (.zip):** [MaziacsAs.zip](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip) (~24,7 МБ)
 >   *Хеш:* [`SHA-256`](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs.zip.sha256)
 >
 > - **🐧 Linux (Ubuntu 64-bit .tar.gz):** [MaziacsAs_Linux.tar.gz](https://github.com/AS7go/MaziacsAs/raw/main/MaziacsAs_Linux.tar.gz)
